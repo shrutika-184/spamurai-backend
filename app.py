@@ -1,62 +1,4 @@
-# from flask import Flask, request, jsonify
-# import joblib
-# import pandas as pd
-# import re
 
-# # Initialize Flask app
-# app = Flask(__name__)
-
-# # Load model, vectorizer, and encoder
-# model = joblib.load("rf_sms_model.pkl")
-# vectorizer = joblib.load("vectorizer.pkl")
-# sender_encoder = joblib.load("sender_encoder.pkl")
-
-# # Text cleaning (same as used during preprocessing)
-# def clean_text(text):
-#     text = text.lower()
-#     text = re.sub(r'http\S+', '', text)
-#     text = re.sub(r'\W', ' ', text)
-#     text = re.sub(r'\s+', ' ', text).strip()
-#     return text
-
-# @app.route('/')
-# def home():
-#     return "🚀 Spamurai Spam Detection API is running successfully!"
-
-# @app.route('/predict', methods=['POST'])
-# def predict():
-#     data = request.get_json()
-
-#     # Extract message and sender from JSON
-#     message = data.get("message", "")
-#     sender = data.get("sender", "")
-
-#     # Clean message
-#     cleaned_message = clean_text(message)
-#     vectorized_msg = vectorizer.transform([cleaned_message])
-
-#     # Encode sender (if in known list)
-#     try:
-#         sender_encoded = sender_encoder.transform([sender])
-#     except:
-#         sender_encoded = [0]  # unknown sender fallback
-
-#     # Combine both features (sender + message)
-#     import numpy as np
-#     combined_features = np.hstack((vectorized_msg.toarray(), [sender_encoded]))
-
-#     # Predict
-#     prediction = model.predict(combined_features)[0]
-#     result = "Spam" if prediction == 1 else "Ham"
-
-#     return jsonify({
-#         "message": message,
-#         "sender": sender,
-#         "prediction": result
-#     })
-
-# if __name__ == "__main__":
-#     app.run(debug=True)
 
 
 from flask import Flask, request, jsonify
@@ -80,6 +22,13 @@ def clean_text(text):
     text = text.translate(str.maketrans('', '', string.punctuation))
     text = re.sub(r'\s+', ' ', text).strip()
     return text
+
+@app.route("/")
+def home():
+    return {
+        "status": "Spamurai backend running",
+        "endpoint": "/predict"
+    }
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -113,3 +62,4 @@ def predict():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
